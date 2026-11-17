@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cut">
+<title>Gerrymander</title>
+<meta name="description" content="A daily map-drawing puzzle: carve the island so the minority wins.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--o:#ff8a3d;--o-d:#d9621a;--o-t:#ffe1c9;--p:#8b5cf6;--p-d:#6236d1;--p-t:#e6dcff;--ink:#22193a;--muted:#6d6480;--sand:#f7e6bb;--sand-d:#d8b56e;--card:#fffaf0;--laser:#59f3ff}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{min-height:100vh;background:linear-gradient(180deg,#c6ecff 0%,#e9f8ff 45%,#fff4e0 100%);color:var(--ink);font:16px/1.4 Fredoka,"Trebuchet MS",system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+main{max-width:520px;margin:0 auto;padding:16px 16px 40px;display:flex;flex-direction:column;gap:12px}
+header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+h1{margin:0;font-size:32px;font-weight:700;letter-spacing:-.5px;line-height:1}
+h1 small{display:inline-block;margin-left:6px;padding:2px 8px;border-radius:999px;background:var(--ink);color:#fff;font-size:13px;vertical-align:middle;letter-spacing:0}
+.sub{margin:6px 0 0;color:var(--muted);font-size:15px}
+.sub b{color:var(--ink)}
+.ob{color:var(--o-d)!important}.pb{color:var(--p-d)!important}
+.icon-btn{border:0;background:#fff;border-radius:12px;width:40px;height:40px;font-size:18px;box-shadow:0 2px 0 #0002;cursor:pointer;flex:none}
+.hud{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center}
+.pill{background:#fff;border-radius:999px;padding:6px 12px;font-weight:600;box-shadow:0 2px 0 #0001;display:flex;align-items:center;gap:6px;white-space:nowrap;font-size:15px}
+.pill.mid{justify-content:center;font-weight:400;color:var(--muted)}
+.pill.mid b{color:var(--ink)}
+.dot{width:14px;height:14px;border-radius:50%}
+.dot.o{background:var(--o)}.dot.p{background:var(--p)}
+.pop{animation:pop .35s cubic-bezier(.3,1.8,.5,1)}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+
+#sea{position:relative;width:100%;aspect-ratio:1;border-radius:28px;touch-action:none;user-select:none;-webkit-user-select:none;
+  background:radial-gradient(circle at 50% 50%,#7fdcf5 0 52%,#4bb6e6 70%,#2e8fd0 100%);box-shadow:inset 0 0 0 3px #ffffff55,0 8px 24px #1e5a8a33;overflow:hidden}
+#sea::before{content:"";position:absolute;inset:0;background:repeating-radial-gradient(circle at 50% 50%,transparent 0 18px,#ffffff22 19px 21px,transparent 22px 40px);animation:tide 6s linear infinite;opacity:.7}
+@keyframes tide{to{transform:scale(1.12)}}
+#sea.shake{animation:shake .28s}
+@keyframes shake{0%,100%{transform:translate(0)}25%{transform:translate(-4px,3px)}50%{transform:translate(4px,-2px)}75%{transform:translate(-2px,-3px)}}
+.layer{position:absolute;inset:6%}
+#board{display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(5,1fr);background:var(--sand);border-radius:22px;box-shadow:0 0 0 7px #fbefcf,0 12px 0 7px var(--sand-d),0 14px 22px 7px #0003}
+#overlay{width:88%;height:88%;left:6%;top:6%;overflow:visible;pointer-events:none}
+#stamps{pointer-events:none}
+.tile{padding:7%;perspective:400px}
+.tile-in{width:100%;height:100%;border-radius:16px;background:#fff6dc;box-shadow:inset 0 -4px 0 #0000000f;transition:background .25s,transform .2s;display:flex;align-items:center;justify-content:center}
+.tile.sel .tile-in{background:#fff;transform:scale(1.06);box-shadow:0 0 0 3px #fff,0 0 16px var(--laser)}
+.tile.d-o .tile-in{background:var(--o-t)}
+.tile.d-p .tile-in{background:var(--p-t)}
+.tile.won-o .tile-in{background:var(--o)}
+.tile.won-p .tile-in{background:var(--p)}
+.tile.squish .tile-in{animation:squish .45s cubic-bezier(.3,1.6,.5,1)}
+@keyframes squish{0%{transform:scale(1)}30%{transform:scale(.84,.88)}65%{transform:scale(1.06)}100%{transform:scale(1)}}
+.tile.flip .tile-in{animation:flip .42s ease-in-out}
+@keyframes flip{0%{transform:rotateY(0)}50%{transform:rotateY(90deg) scale(.95)}100%{transform:rotateY(0)}}
+
+.blob{width:86%;height:86%;overflow:visible}
+.body-g{transform-box:fill-box;transform-origin:50% 100%;transition:transform .25s}
+.tile.o .body{fill:var(--o)}.tile.p .body{fill:var(--p)}
+.tile.won-o.o .body{fill:#ffb27f}.tile.won-p.p .body{fill:#b597ff}
+.shine{fill:#fff;opacity:.45}
+.eyes circle{fill:var(--ink)}
+.eyes{transform-box:fill-box;transform-origin:center;animation:blink 4.5s infinite}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+.mouth{fill:none;stroke:var(--ink);stroke-width:4.5;stroke-linecap:round;display:none}
+.m-flat{display:block}
+.shades,.sweat{display:none}
+.shades path{fill:#15112a}.shades .bridge{fill:none;stroke:#15112a;stroke-width:4}
+.shades .glint{fill:#ffffff99}
+.sweat{fill:#7fd3ff;stroke:#fff;stroke-width:2}
+.cool .shades{display:block}.cool .eyes{display:none}
+.cool .m-flat,.smug .m-flat,.nervous .m-flat,.sad .m-flat{display:none}
+.cool .m-smile,.smug .m-smile{display:block}
+.nervous .m-frown,.sad .m-frown{display:block}
+.cool .body-g{animation:bop .5s ease-in-out infinite}
+@keyframes bop{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-9%) scale(.95,1.05)}}
+.smug .body-g{transform:scale(1.04)}
+.nervous .body-g{transform:translateY(5%) scale(1.07,.88);animation:jitter .16s linear infinite}
+@keyframes jitter{0%,100%{translate:0 0}50%{translate:1.5px 0}}
+.nervous .sweat{display:block;animation:drip 1.1s ease-in infinite}
+@keyframes drip{0%{transform:translateY(-4px);opacity:0}25%{opacity:1}100%{transform:translateY(14px);opacity:0}}
+.sad .body-g{transform:translateY(4%) scale(1.04,.92)}
+
+.dist{stroke-width:7;stroke-linejoin:round;fill-opacity:.14;transform-box:fill-box;transform-origin:center}
+.dist.o{stroke:var(--o-d);fill:var(--o)}.dist.p{stroke:var(--p-d);fill:var(--p)}
+.dist.snap{animation:band .55s cubic-bezier(.3,1.7,.45,1)}
+@keyframes band{0%{transform:scale(1.14);stroke-width:14}100%{transform:scale(1);stroke-width:7}}
+.preview{fill:#fff;fill-opacity:.25;stroke:#fff;stroke-width:5;stroke-dasharray:14 10;stroke-linejoin:round;animation:ants .6s linear infinite}
+@keyframes ants{to{stroke-dashoffset:-24}}
+.laser{fill:none;stroke:var(--laser);stroke-width:7;stroke-linecap:round;stroke-linejoin:round;filter:url(#glow)}
+.laser-core{fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+
+.stamp{position:absolute;transform:translate(-50%,-50%) rotate(-9deg);padding:3px 9px;border:4px solid currentColor;border-radius:10px;background:#fffffff0;font-weight:700;font-size:clamp(13px,3.8vw,19px);white-space:nowrap;letter-spacing:.5px;animation:slam .34s cubic-bezier(.2,1.5,.4,1) both;box-shadow:0 4px 0 #0002}
+.stamp.o{color:var(--o-d)}.stamp.p{color:var(--p-d)}
+@keyframes slam{0%{transform:translate(-50%,-50%) rotate(-9deg) scale(2.8);opacity:0}55%{opacity:1}100%{transform:translate(-50%,-50%) rotate(-9deg) scale(1);opacity:1}}
+
+.controls{display:grid;grid-template-columns:1fr 1fr 2fr;gap:8px}
+button{font:inherit}
+.btn{border:0;border-radius:14px;padding:12px 10px;font-weight:600;font-size:16px;background:#fff;color:var(--ink);box-shadow:0 3px 0 #0002;cursor:pointer;transition:transform .08s}
+.btn:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 0 #0002}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.primary{background:var(--ink);color:#fff;box-shadow:0 3px 0 #000}
+.btn.primary:not(:disabled){animation:ready 1.6s ease-in-out infinite}
+@keyframes ready{50%{box-shadow:0 3px 0 #000,0 0 0 5px #ff8a3d55}}
+.help{margin:0;color:var(--muted);font-size:14px;text-align:center}
+#result{background:var(--card);border-radius:20px;padding:16px;box-shadow:0 4px 0 #0001,0 8px 24px #0001;text-align:center;animation:rise .4s cubic-bezier(.3,1.5,.5,1)}
+@keyframes rise{from{transform:translateY(16px);opacity:0}}
+#result h2{margin:0 0 4px;font-size:24px}
+#result p{margin:4px 0;color:var(--muted)}
+#result .row{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+#result pre{font:20px/1.15 ui-monospace,monospace;margin:10px 0 0}
+footer{display:flex;justify-content:center;gap:16px;font-size:14px}
+.link{border:0;background:none;color:var(--muted);text-decoration:underline;cursor:pointer;padding:4px}
+#toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,40px);opacity:0;background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;transition:.25s;pointer-events:none}
+#toast.show{transform:translate(-50%,0);opacity:1}
+@media (max-width:380px){h1{font-size:27px}.pill{padding:5px 9px;font-size:14px}}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1>Gerrymander <small id="num">#1</small></h1>
+      <p class="sub">Carve the island into <b>5 districts of 5</b>. <b class="ob">Orange</b> is outnumbered <b>11–14</b>, so rig it: make Orange win <b>3</b>.</p>
+    </div>
+    <button class="icon-btn" id="mute" aria-label="Toggle sound">🔊</button>
+  </header>
+
+  <div class="hud">
+    <div class="pill"><span class="dot o"></span><span id="oWins">0</span></div>
+    <div class="pill mid"><span>Districts <b id="dCount">0</b>/5</span><span>·</span><span title="How rigged your map looks. Lower = tidier districts. Par is the tidiest winning map.">Suspicion <b id="susp">–</b> <span id="parWrap">(par <b id="par">–</b>)</span></span></div>
+    <div class="pill"><span id="pWins">0</span><span class="dot p"></span></div>
+  </div>
+
+  <div id="sea">
+    <div id="board" class="layer"></div>
+    <svg id="overlay" class="layer" viewBox="0 0 500 500" aria-hidden="true">
+      <defs><filter id="glow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <g id="distLayer"></g><g id="liveLayer"></g>
+    </svg>
+    <div id="stamps" class="layer"></div>
+  </div>
+
+  <p class="help">Drag across 5 neighbouring tiles to fence a district · tap a district to tear it down · 3 of 5 wins a seat</p>
+
+  <div class="controls">
+    <button class="btn" id="undo">Undo</button>
+    <button class="btn" id="reset">Clear</button>
+    <button class="btn primary" id="certify">Certify Election</button>
+  </div>
+
+  <section id="result" hidden></section>
+
+  <footer>
+    <button class="link" id="practice">New practice map</button>
+    <button class="link" id="daily" hidden>Back to today's map</button>
+  </footer>
+</main>
+<div id="toast" role="status"></div>
+
+<script>
+(() => {
+/* ---------- core: grid, partitions, level generation ---------- */
+const N=5,C=25,S=5,ORANGE=11,LO=0.004,HI=0.03;
+const rc=i=>[Math.floor(i/N),i%N];
+const NB=[];for(let i=0;i<C;i++){const[r,c]=rc(i);NB[i]=[];if(r>0)NB[i].push(i-N);if(r<N-1)NB[i].push(i+N);if(c>0)NB[i].push(i-1);if(c<N-1)NB[i].push(i+1);}
+const bits=m=>{const a=[];for(let i=0;i<C;i++)if(m>>i&1)a.push(i);return a};
+const pc=m=>{let c=0;while(m){m&=m-1;c++}return c};
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+// every connected 5-tile shape that fits on the board
+const PL=(()=>{const seen=new Set();for(let s=0;s<C;s++){let lv=new Set([1<<s]);for(let k=1;k<S;k++){const nx=new Set();for(const m of lv)for(const c of bits(m))for(const n of NB[c])if(!(m>>n&1))nx.add(m|1<<n);lv=nx}for(const m of lv)seen.add(m)}return[...seen]})();
+// suspicion of a district = spread of its tiles around their centre (x5 so it is an integer)
+const SPR=new Map(PL.map(m=>{const cs=bits(m).map(rc);const mr=cs.reduce((a,p)=>a+p[0],0)/S,mc=cs.reduce((a,p)=>a+p[1],0)/S;return[m,Math.round(cs.reduce((a,p)=>a+(p[0]-mr)**2+(p[1]-mc)**2,0)*S)]}));
+const FULL=(1<<C)-1;
+function okFree(used){let seen=used;for(let i=0;i<C;i++)if(!(seen>>i&1)){let st=[i],n=0;seen|=1<<i;while(st.length){const x=st.pop();n++;for(const y of NB[x])if(!(seen>>y&1)){seen|=1<<y;st.push(y)}}if(n%S)return false}return true}
+// all 4006 ways to split the island into 5 districts of 5
+const PARTS=(()=>{const byMin=Array.from({length:C},()=>[]);for(const m of PL){let i=0;while(!(m>>i&1))i++;byMin[i].push(m)}const out=[],cur=[];(function rec(used){if(used===FULL){out.push(cur.slice());return}let c=0;while(used>>c&1)c++;for(const m of byMin[c])if(!(m&used)&&okFree(used|m)){cur.push(m);rec(used|m);cur.pop()}})(0);return out})();
+function evalLayout(om){let win=0,par=Infinity;for(const P of PARTS){let w=0,s=0;for(const m of P){if(pc(m&om)>=3)w++;s+=SPR.get(m)}if(w>=3){win++;if(s<par)par=s}}return{win,par}}
+// hard-but-fair: only 0.4%–3% of all possible maps should be winning ones
+function makeLevel(seed){const rnd=mulberry32(seed);let best=null;for(let t=0;t<400;t++){const cells=[...Array(C).keys()];for(let i=C-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[cells[i],cells[j]]=[cells[j],cells[i]]}let om=0;for(let i=0;i<ORANGE;i++)om|=1<<cells[i];const e=evalLayout(om);const f=e.win/PARTS.length;if(e.win>0&&f>=LO&&f<=HI)return{om,...e};if(e.win>0&&(!best||e.win<best.win))best={om,...e}}return best}
+const EPOCH=Date.UTC(2026,10,17);
+function todayNum(){const d=new Date();return Math.floor((Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())-EPOCH)/864e5)+1}
+
+/* ---------- audio (synthesised, no files) ---------- */
+let ac=null,muted=false;
+try{muted=localStorage.getItem('gm-muted')==='1'}catch(e){}
+function A(){if(!ac){try{ac=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(ac&&ac.state==='suspended')ac.resume();return ac}
+function tone(f,d=.12,type='sine',v=.15,when=0,slide=0){const a=A();if(!a||muted)return;const t=a.currentTime+when,o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(slide)o.frequency.exponentialRampToValueAtTime(f*slide,t+d);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(a.destination);o.start(t);o.stop(t+d+.03)}
+function thud(v=.4,when=0){const a=A();if(!a||muted)return;const t=a.currentTime+when,len=a.sampleRate*.12,b=a.createBuffer(1,len,a.sampleRate),ch=b.getChannelData(0);for(let i=0;i<len;i++)ch[i]=(Math.random()*2-1)*(1-i/len)**3;const s=a.createBufferSource(),fl=a.createBiquadFilter(),g=a.createGain();s.buffer=b;fl.type='lowpass';fl.frequency.value=900;g.gain.value=v;s.connect(fl).connect(g).connect(a.destination);s.start(t);tone(90,.18,'sine',.35,when,.5)}
+const sfx={
+  tick:k=>tone(480+k*110,.07,'triangle',.13),
+  snap:()=>{tone(240,.28,'sawtooth',.05,0,.55);tone(130,.22,'sine',.3,0,.6);tone(880,.05,'square',.04,.02)},
+  fizzle:()=>tone(220,.22,'square',.04,0,.5),
+  tear:()=>{tone(700,.12,'triangle',.08,0,.4);tone(300,.1,'sine',.1,.03,.5)},
+  clack:k=>tone(1500+k*60,.03,'square',.035),
+  chime:j=>{const f=523.25*Math.pow(2,j*3/12);tone(f,.55,'sine',.18);tone(f*2,.3,'triangle',.05)},
+  win:()=>[0,4,7,12].forEach((s,i)=>tone(523.25*Math.pow(2,s/12),.35,'triangle',.14,i*.1)),
+  lose:()=>[7,3,0].forEach((s,i)=>tone(330*Math.pow(2,s/12),.4,'sine',.12,i*.15))
+};
+
+/* ---------- elements ---------- */
+const $=id=>document.getElementById(id);
+const sea=$('sea'),board=$('board'),distLayer=$('distLayer'),liveLayer=$('liveLayer'),stampsEl=$('stamps');
+const BLOB=`<svg class="blob" viewBox="0 0 100 100"><g class="body-g">
+<path class="body" d="M50 12C77 12 89 33 89 57C89 80 73 91 50 91C27 91 11 80 11 57C11 33 23 12 50 12Z"/>
+<ellipse class="shine" cx="34" cy="30" rx="11" ry="6" transform="rotate(-20 34 30)"/>
+<g class="eyes"><circle cx="38" cy="50" r="6.5"/><circle cx="62" cy="50" r="6.5"/></g>
+<g class="shades"><path d="M22 43h24v6a9 9 0 0 1-9 9h-6a9 9 0 0 1-9-9z"/><path d="M54 43h24v6a9 9 0 0 1-9 9h-6a9 9 0 0 1-9-9z"/><path class="bridge" d="M44 46h12"/><path class="glint" d="M27 46h6l-3 5h-4z"/></g>
+<path class="mouth m-flat" d="M42 69h16"/><path class="mouth m-smile" d="M38 65Q50 78 62 65"/><path class="mouth m-frown" d="M40 73Q50 64 60 73"/>
+<path class="sweat" d="M84 26q7 11 0 15q-7-4 0-15z"/></g></svg>`;
+
+/* ---------- state ---------- */
+let L,mode='daily',num=todayNum(),districts=[],owner=[],draw=null,trail=[],last=null,pendingRemove=-1,locked=false,attempts=1,tiles=[];
+const lean=m=>{const o=pc(m&L.om),p=pc(m)-o;return o>p?'o':p>o?'p':''};
+const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+function load(newMode){
+  mode=newMode;
+  const seed=mode==='daily'?(Math.imul(num,2654435761)>>>0)^0x5eed:(Math.random()*2**32)>>>0;
+  L=makeLevel(seed);attempts=1;
+  $('num').textContent=mode==='daily'?'#'+num:'Practice';
+  $('par').textContent=L.par;
+  $('daily').hidden=mode==='daily';
+  board.innerHTML='';tiles=[];
+  for(let i=0;i<C;i++){const t=document.createElement('div');t.className='tile '+((L.om>>i&1)?'o':'p');t.innerHTML=`<div class="tile-in">${BLOB}</div>`;t.querySelector('.eyes').style.animationDelay=(-Math.random()*4.5).toFixed(2)+'s';board.appendChild(t);tiles.push(t)}
+  clearMap();
+  const best=mode==='daily'&&store.get('gm-best-'+num);
+  if(best)showResult(best,true);
+}
+function clearMap(){districts=[];owner=new Array(C).fill(-1);draw=null;trail=[];locked=false;stampsEl.innerHTML='';$('result').hidden=true;tiles.forEach(t=>t.classList.remove('won-o','won-p','flip'));refresh(true)}
+function rebuildOwner(){owner.fill(-1);districts.forEach((d,j)=>bits(d.mask).forEach(i=>owner[i]=j))}
+
+/* ---------- geometry ---------- */
+function outline(m,inset){
+  const E=new Map(),add=(a,b,c,d)=>E.set(a+','+b,[c,d]);
+  for(const i of bits(m)){const[r,c]=rc(i);
+    if(r===0||!(m>>(i-N)&1))add(c,r,c+1,r);
+    if(c===N-1||!(m>>(i+1)&1))add(c+1,r,c+1,r+1);
+    if(r===N-1||!(m>>(i+N)&1))add(c+1,r+1,c,r+1);
+    if(c===0||!(m>>(i-1)&1))add(c,r+1,c,r);}
+  const k0=E.keys().next().value,pts=[];let k=k0;
+  do{pts.push(k.split(',').map(Number));const n=E.get(k);k=n[0]+','+n[1]}while(k!==k0&&pts.length<60);
+  const n=pts.length,out=[];
+  for(let j=0;j<n;j++){const a=pts[(j-1+n)%n],b=pts[j],c=pts[(j+1)%n];const d1=[Math.sign(b[0]-a[0]),Math.sign(b[1]-a[1])],d2=[Math.sign(c[0]-b[0]),Math.sign(c[1]-b[1])];if(d1[0]===d2[0]&&d1[1]===d2[1])continue;
+    out.push((b[0]*100+inset*(-d1[1]-d2[1])).toFixed(1)+' '+(b[1]*100+inset*(d1[0]+d2[0])).toFixed(1))}
+  return 'M'+out.join('L')+'Z';
+}
+function pt(e){const r=board.getBoundingClientRect();return[(e.clientX-r.left)/r.width*500,(e.clientY-r.top)/r.height*500]}
+function cellAt(p,radius=50){if(p[0]<0||p[1]<0||p[0]>=500||p[1]>=500)return-1;const c=Math.floor(p[0]/100),r=Math.floor(p[1]/100);return Math.hypot(p[0]-(c*100+50),p[1]-(r*100+50))<=radius?r*N+c:-1}
+
+/* ---------- rendering ---------- */
+function setMood(t,m){if(t.dataset.mood===m)return;t.dataset.mood=m;t.classList.remove('cool','smug','nervous','sad');if(m){t.classList.add(m);if(m==='cool')t.querySelector('.body-g').style.animationDelay=-(performance.now()%500)+'ms'}}
+function refresh(districtsChanged){
+  for(let i=0;i<C;i++){
+    const t=tiles[i],mine=(L.om>>i&1)?'o':'p',inDraw=!!(draw&&draw.mask>>i&1),d=owner[i];
+    const g=inDraw?draw.mask:d>=0?districts[d].mask:0,ln=g?lean(g):'';
+    setMood(t,!ln?'':ln===mine?(mine==='o'?'cool':'smug'):(mine==='p'?'nervous':'sad'));
+    t.classList.toggle('sel',inDraw);
+    const dl=d>=0?lean(districts[d].mask):'';t.classList.toggle('d-o',dl==='o');t.classList.toggle('d-p',dl==='p');
+  }
+  if(!locked){let ow=0,pw=0,s=0;for(const d of districts){lean(d.mask)==='o'?ow++:pw++;s+=SPR.get(d.mask)}
+    $('oWins').textContent=ow;$('pWins').textContent=pw;$('susp').textContent=districts.length?s:'–'}
+  $('dCount').textContent=districts.length;
+  $('certify').disabled=districts.length<5||locked;$('undo').disabled=!districts.length||locked;$('reset').disabled=!districts.length||locked;
+  if(districtsChanged){distLayer.innerHTML=districts.map(d=>`<path class="dist ${lean(d.mask)}${d.fresh?' snap':''}" d="${outline(d.mask,8)}"/>`).join('');districts.forEach(d=>d.fresh=false)}
+  drawLive();
+}
+function drawLive(){
+  let h='';
+  if(draw)h+=`<path class="preview" d="${outline(draw.mask,8)}"/>`;
+  if(trail.length>1){const p=trail.map(q=>q[0].toFixed(0)+','+q[1].toFixed(0)).join(' ');h+=`<polyline class="laser" points="${p}"/><polyline class="laser-core" points="${p}"/>`}
+  liveLayer.innerHTML=h;
+}
+function bump(el){el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop')}
+
+/* ---------- drawing input ---------- */
+function tryAdd(i){
+  if(!draw||i<0||draw.mask>>i&1||owner[i]>=0)return;
+  if(!NB[i].some(n=>draw.mask>>n&1))return;
+  draw.cells.push(i);draw.mask|=1<<i;sfx.tick(draw.cells.length-1);
+  if(navigator.vibrate)try{navigator.vibrate(6)}catch(e){}
+  if(draw.cells.length===S)commit();else refresh(false);
+}
+function commit(){
+  const m=draw.mask;districts.push({mask:m,fresh:true});draw=null;rebuildOwner();
+  bits(m).forEach(i=>{const t=tiles[i];t.classList.remove('squish');void t.offsetWidth;t.classList.add('squish')});
+  sfx.snap();refresh(true);bump($(lean(m)==='o'?'oWins':'pWins'));
+}
+function removeDistrict(j){districts.splice(j,1);rebuildOwner();sfx.tear();refresh(true)}
+
+sea.addEventListener('pointerdown',e=>{
+  if(locked)return;A();const p=pt(e),i=cellAt(p,60);if(i<0)return;
+  try{sea.setPointerCapture(e.pointerId)}catch(_){}
+  if(owner[i]>=0){pendingRemove=owner[i];return}
+  draw={cells:[i],mask:1<<i};last=p;trail=[p];sfx.tick(0);refresh(false);
+});
+sea.addEventListener('pointermove',e=>{
+  if(!draw&&!trail.length)return;const p=pt(e);
+  if(draw&&last){const steps=Math.max(1,Math.ceil(Math.hypot(p[0]-last[0],p[1]-last[1])/15));
+    for(let s=1;s<=steps&&draw;s++)tryAdd(cellAt([last[0]+(p[0]-last[0])*s/steps,last[1]+(p[1]-last[1])*s/steps],42))}
+  last=p;if(trail.length){trail.push(p);if(trail.length>18)trail.shift()}drawLive();
+});
+function endPointer(){
+  if(pendingRemove>=0){removeDistrict(pendingRemove);pendingRemove=-1;return}
+  if(draw){draw=null;sfx.fizzle();refresh(false)}
+  trail=[];last=null;drawLive();
+}
+sea.addEventListener('pointerup',endPointer);sea.addEventListener('pointercancel',endPointer);
+
+/* ---------- certification ---------- */
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+async function certify(){
+  if(districts.length<5||locked)return;locked=true;refresh(false);
+  let ow=0,pw=0;$('oWins').textContent=0;$('pWins').textContent=0;
+  const order=districts.map(d=>{const cs=bits(d.mask);return{d,cs,cx:cs.reduce((a,i)=>a+rc(i)[1],0)/S}}).sort((a,b)=>a.cx-b.cx);
+  for(let j=0;j<order.length;j++){
+    const{d,cs}=order[j],w=lean(d.mask);
+    cs.forEach((i,k)=>setTimeout(()=>{tiles[i].classList.add('flip');sfx.clack(k);setTimeout(()=>tiles[i].classList.add('won-'+w),210)},k*65));
+    await wait(cs.length*65+260);
+    const r=cs.reduce((a,i)=>a+rc(i)[0],0)/S,c=cs.reduce((a,i)=>a+rc(i)[1],0)/S;
+    const st=document.createElement('div');st.className='stamp '+w;st.textContent=(w==='o'?'ORANGE':'PURPLE')+' +1';
+    st.style.left=((c+.5)*20)+'%';st.style.top=((r+.5)*20)+'%';stampsEl.appendChild(st);
+    thud();sfx.chime(j);sea.classList.remove('shake');void sea.offsetWidth;sea.classList.add('shake');
+    if(w==='o'){ow++;$('oWins').textContent=ow;bump($('oWins'))}else{pw++;$('pWins').textContent=pw;bump($('pWins'))}
+    await wait(420);
+  }
+  await wait(250);
+  const susp=districts.reduce((a,d)=>a+SPR.get(d.mask),0);
+  const mosaic=[];for(let r=0;r<N;r++){let row='';for(let c=0;c<N;c++)row+=lean(districts[owner[r*N+c]].mask)==='o'?'🟧':'🟪';mosaic.push(row)}
+  const res={ow,pw,susp,par:L.par,attempts,mosaic};
+  if(mode==='daily'&&ow>=3){const best=store.get('gm-best-'+num);if(!best||susp<best.susp)store.set('gm-best-'+num,res)}
+  showResult(res,false);
+}
+function grade(r){if(r.ow<3)return['Purple holds the island','The voters got their way. Unacceptable.'];
+  if(r.susp<=r.par)return['Flawless rig','Tidiest winning map possible. The courts suspect nothing.'];
+  if(r.susp<=r.par+12)return['Certified!','A little lumpy, but it should survive a court challenge.'];
+  return['Certified… barely','Those districts look like a salamander. Journalists are circling.']}
+function shareText(r){const head=mode==='daily'?`Gerrymander #${num}`:'Gerrymander Practice';
+  return `${head} | ${r.ow}-${r.pw} ${r.ow>=3?'Victory':'Defeat'} | Suspicion ${r.susp} (par ${r.par})${r.attempts>1?` | ${r.attempts} tries`:''}\n${r.mosaic.join('\n')}`}
+function showResult(r,restored){
+  const[h,p]=grade(r),el=$('result');
+  el.innerHTML=`<h2>${restored?"Today's best: ":''}${h}</h2><p>${p}</p><p><b>${r.ow}–${r.pw}</b> · Suspicion <b>${r.susp}</b> (par ${r.par})${r.attempts>1?` · ${r.attempts} tries`:''}</p><pre>${r.mosaic.join('\n')}</pre>
+  <div class="row"><button class="btn primary" id="share">Share result</button><button class="btn" id="again">${r.ow>=3?'Beat my suspicion':'Redraw'}</button></div>`;
+  el.hidden=false;
+  if(!restored)(r.ow>=3?sfx.win:sfx.lose)();
+  $('share').onclick=()=>share(shareText(r));
+  $('again').onclick=()=>{if(!restored)attempts++;clearMap();sea.scrollIntoView({behavior:'smooth',block:'center'})};
+  if(!restored)el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+async function share(text){
+  try{if(navigator.share&&matchMedia('(pointer:coarse)').matches){await navigator.share({text});return}}catch(e){if(e&&e.name==='AbortError')return}
+  try{await navigator.clipboard.writeText(text);toast('Copied to clipboard')}
+  catch(e){const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('Copied to clipboard')}catch(_){toast('Could not copy')}ta.remove()}
+}
+let tt;function toast(s){const t=$('toast');t.textContent=s;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),1800)}
+
+/* ---------- buttons ---------- */
+$('certify').onclick=certify;
+$('undo').onclick=()=>{if(districts.length)removeDistrict(districts.length-1)};
+$('reset').onclick=()=>{if(districts.length){sfx.tear();clearMap()}};
+$('practice').onclick=()=>load('practice');
+$('daily').onclick=()=>load('daily');
+const mb=$('mute');mb.textContent=muted?'🔇':'🔊';
+mb.onclick=()=>{muted=!muted;mb.textContent=muted?'🔇':'🔊';try{localStorage.setItem('gm-muted',muted?'1':'0')}catch(e){}};
+
+load('daily');
+window.__gm={get L(){return L},PARTS,SPR,lean,get districts(){return districts}};
+})();
+</script>
+</body>
+</html>
