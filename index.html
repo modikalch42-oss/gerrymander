@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--o:#ff8a3d;--o-d:#d9621a;--o-t:#ffe1c9;--p:#8b5cf6;--p-d:#6236d1;--p-t:#e6dcff;--ink:#22193a;--muted:#6d6480;--sand:#f7e6bb;--sand-d:#d8b56e;--card:#fffaf0;--laser:#59f3ff}
+:root{--o:#ff8a3d;--o-d:#d9621a;--o-t:#ffd9bb;--p:#8b5cf6;--p-d:#6236d1;--p-t:#ddd0ff;--ink:#22193a;--muted:#6d6480;--sand:#f7e3b0;--sand-d:#d4ad62;--card:#fffaf0;--laser:#59f3ff}
 *{box-sizing:border-box}
 html,body{margin:0}
 body{min-height:100vh;background:linear-gradient(180deg,#c6ecff 0%,#e9f8ff 45%,#fff4e0 100%);color:var(--ink);font:16px/1.4 Fredoka,"Trebuchet MS",system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
@@ -16,9 +16,10 @@ main{max-width:520px;margin:0 auto;padding:16px 16px 40px;display:flex;flex-dire
 header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
 h1{margin:0;font-size:32px;font-weight:700;letter-spacing:-.5px;line-height:1}
 h1 small{display:inline-block;margin-left:6px;padding:2px 8px;border-radius:999px;background:var(--ink);color:#fff;font-size:13px;vertical-align:middle;letter-spacing:0}
-.sub{margin:6px 0 0;color:var(--muted);font-size:15px}
+.place{margin:6px 0 0;font-weight:600;font-size:17px}
+.sub{margin:4px 0 0;color:var(--muted);font-size:15px}
 .sub b{color:var(--ink)}
-.ob{color:var(--o-d)!important}.pb{color:var(--p-d)!important}
+.ob{color:var(--o-d)!important}
 .icon-btn{border:0;background:#fff;border-radius:12px;width:40px;height:40px;font-size:18px;box-shadow:0 2px 0 #0002;cursor:pointer;flex:none}
 .hud{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center}
 .pill{background:#fff;border-radius:999px;padding:6px 12px;font-weight:600;box-shadow:0 2px 0 #0001;display:flex;align-items:center;gap:6px;white-space:nowrap;font-size:15px}
@@ -30,31 +31,48 @@ h1 small{display:inline-block;margin-left:6px;padding:2px 8px;border-radius:999p
 @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
 
 #sea{position:relative;width:100%;aspect-ratio:1;border-radius:28px;touch-action:none;user-select:none;-webkit-user-select:none;
-  background:radial-gradient(circle at 50% 50%,#7fdcf5 0 52%,#4bb6e6 70%,#2e8fd0 100%);box-shadow:inset 0 0 0 3px #ffffff55,0 8px 24px #1e5a8a33;overflow:hidden}
-#sea::before{content:"";position:absolute;inset:0;background:repeating-radial-gradient(circle at 50% 50%,transparent 0 18px,#ffffff22 19px 21px,transparent 22px 40px);animation:tide 6s linear infinite;opacity:.7}
+  background:radial-gradient(circle at 50% 50%,#86def5 0 45%,#4bb6e6 68%,#2e8fd0 100%);box-shadow:inset 0 0 0 3px #ffffff55,0 8px 24px #1e5a8a33;overflow:hidden}
+#sea::before{content:"";position:absolute;inset:0;background:repeating-radial-gradient(circle at 50% 50%,transparent 0 18px,#ffffff22 19px 21px,transparent 22px 40px);animation:tide 6s linear infinite;opacity:.6}
 @keyframes tide{to{transform:scale(1.12)}}
 #sea.shake{animation:shake .28s}
 @keyframes shake{0%,100%{transform:translate(0)}25%{transform:translate(-4px,3px)}50%{transform:translate(4px,-2px)}75%{transform:translate(-2px,-3px)}}
-.layer{position:absolute;inset:6%}
-#board{display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(5,1fr);background:var(--sand);border-radius:22px;box-shadow:0 0 0 7px #fbefcf,0 12px 0 7px var(--sand-d),0 14px 22px 7px #0003}
-#overlay{width:88%;height:88%;left:6%;top:6%;overflow:visible;pointer-events:none}
+#map,#stamps{position:absolute;inset:0;width:100%;height:100%}
+#map{overflow:visible}
 #stamps{pointer-events:none}
-.tile{padding:7%;perspective:400px}
-.tile-in{width:100%;height:100%;border-radius:16px;background:#fff6dc;box-shadow:inset 0 -4px 0 #0000000f;transition:background .25s,transform .2s;display:flex;align-items:center;justify-content:center}
-.tile.sel .tile-in{background:#fff;transform:scale(1.06);box-shadow:0 0 0 3px #fff,0 0 16px var(--laser)}
-.tile.d-o .tile-in{background:var(--o-t)}
-.tile.d-p .tile-in{background:var(--p-t)}
-.tile.won-o .tile-in{background:var(--o)}
-.tile.won-p .tile-in{background:var(--p)}
-.tile.squish .tile-in{animation:squish .45s cubic-bezier(.3,1.6,.5,1)}
-@keyframes squish{0%{transform:scale(1)}30%{transform:scale(.84,.88)}65%{transform:scale(1.06)}100%{transform:scale(1)}}
-.tile.flip .tile-in{animation:flip .42s ease-in-out}
-@keyframes flip{0%{transform:rotateY(0)}50%{transform:rotateY(90deg) scale(.95)}100%{transform:rotateY(0)}}
 
-.blob{width:86%;height:86%;overflow:visible}
+.surf{fill:none;stroke:#fff;stroke-width:26;opacity:.22;stroke-linejoin:round;animation:surf 3s ease-in-out infinite}
+@keyframes surf{50%{stroke-width:36;opacity:.12}}
+.cliff{fill:var(--sand-d)}
+.beach{fill:var(--sand);stroke:var(--sand);stroke-width:16;stroke-linejoin:round}
+.cell{stroke:none;transition:fill .25s}
+.cell.l0{fill:#fff4d6}.cell.l1{fill:#fbeac2}.cell.l2{fill:#fff0cc}.cell.l3{fill:#f7e6bd}
+.cell.d-o{fill:var(--o-t)}.cell.d-p{fill:var(--p-t)}
+.cell.sel{fill:#fff}
+.cell.won-o{fill:var(--o)}.cell.won-p{fill:var(--p)}
+.precincts{fill:none;stroke:#7a5a2a;stroke-opacity:.28;stroke-width:2;stroke-dasharray:5 6;stroke-linecap:round}
+.shoreline{fill:none;stroke:#b98f45;stroke-opacity:.5;stroke-width:2}
+
+.dist{transform-box:view-box}
+.band{fill:none;stroke-width:14;stroke-linejoin:round;stroke-linecap:round}
+.dist.o .band{stroke:var(--o-d)}.dist.p .band{stroke:var(--p-d)}
+.dist.snap{animation:band .55s cubic-bezier(.3,1.7,.45,1)}
+@keyframes band{0%{transform:scale(1.12)}100%{transform:scale(1)}}
+.dist.snap .band{animation:bandw .55s ease-out}
+@keyframes bandw{0%{stroke-width:26}100%{stroke-width:14}}
+.preview{fill:none;stroke:#fff;stroke-width:5;stroke-dasharray:12 9;stroke-linecap:round;animation:ants .6s linear infinite;filter:drop-shadow(0 0 3px #59f3ff)}
+@keyframes ants{to{stroke-dashoffset:-21}}
+.laser{fill:none;stroke:var(--laser);stroke-width:7;stroke-linecap:round;stroke-linejoin:round;filter:url(#glow)}
+.laser-core{fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+
+.blob{pointer-events:none}
+.fx{transform-box:fill-box;transform-origin:50% 100%}
+.blob.squish .fx{animation:squish .45s cubic-bezier(.3,1.6,.5,1)}
+@keyframes squish{0%{transform:scale(1)}30%{transform:scale(1.18,.78)}65%{transform:scale(.95,1.06)}100%{transform:scale(1)}}
+.blob.flip .fx{transform-origin:50% 50%;animation:flip .42s ease-in-out}
+@keyframes flip{0%{transform:scaleX(1)}50%{transform:scaleX(0)}100%{transform:scaleX(1)}}
+.shadow{fill:#00000022}
 .body-g{transform-box:fill-box;transform-origin:50% 100%;transition:transform .25s}
-.tile.o .body{fill:var(--o)}.tile.p .body{fill:var(--p)}
-.tile.won-o.o .body{fill:#ffb27f}.tile.won-p.p .body{fill:#b597ff}
+.blob.o .body{fill:var(--o);stroke:var(--o-d);stroke-width:3}.blob.p .body{fill:var(--p);stroke:var(--p-d);stroke-width:3}
 .shine{fill:#fff;opacity:.45}
 .eyes circle{fill:var(--ink)}
 .eyes{transform-box:fill-box;transform-origin:center;animation:blink 4.5s infinite}
@@ -78,16 +96,7 @@ h1 small{display:inline-block;margin-left:6px;padding:2px 8px;border-radius:999p
 @keyframes drip{0%{transform:translateY(-4px);opacity:0}25%{opacity:1}100%{transform:translateY(14px);opacity:0}}
 .sad .body-g{transform:translateY(4%) scale(1.04,.92)}
 
-.dist{stroke-width:7;stroke-linejoin:round;fill-opacity:.14;transform-box:fill-box;transform-origin:center}
-.dist.o{stroke:var(--o-d);fill:var(--o)}.dist.p{stroke:var(--p-d);fill:var(--p)}
-.dist.snap{animation:band .55s cubic-bezier(.3,1.7,.45,1)}
-@keyframes band{0%{transform:scale(1.14);stroke-width:14}100%{transform:scale(1);stroke-width:7}}
-.preview{fill:#fff;fill-opacity:.25;stroke:#fff;stroke-width:5;stroke-dasharray:14 10;stroke-linejoin:round;animation:ants .6s linear infinite}
-@keyframes ants{to{stroke-dashoffset:-24}}
-.laser{fill:none;stroke:var(--laser);stroke-width:7;stroke-linecap:round;stroke-linejoin:round;filter:url(#glow)}
-.laser-core{fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
-
-.stamp{position:absolute;transform:translate(-50%,-50%) rotate(-9deg);padding:3px 9px;border:4px solid currentColor;border-radius:10px;background:#fffffff0;font-weight:700;font-size:clamp(13px,3.8vw,19px);white-space:nowrap;letter-spacing:.5px;animation:slam .34s cubic-bezier(.2,1.5,.4,1) both;box-shadow:0 4px 0 #0002}
+.stamp{position:absolute;transform:translate(-50%,-50%) rotate(-9deg);padding:3px 9px;border:4px solid currentColor;border-radius:10px;background:#fffffff0;font-weight:700;font-size:clamp(12px,3.6vw,18px);white-space:nowrap;letter-spacing:.5px;animation:slam .34s cubic-bezier(.2,1.5,.4,1) both;box-shadow:0 4px 0 #0002}
 .stamp.o{color:var(--o-d)}.stamp.p{color:var(--p-d)}
 @keyframes slam{0%{transform:translate(-50%,-50%) rotate(-9deg) scale(2.8);opacity:0}55%{opacity:1}100%{transform:translate(-50%,-50%) rotate(-9deg) scale(1);opacity:1}}
 
@@ -105,7 +114,7 @@ button{font:inherit}
 #result h2{margin:0 0 4px;font-size:24px}
 #result p{margin:4px 0;color:var(--muted)}
 #result .row{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
-#result pre{font:20px/1.15 ui-monospace,monospace;margin:10px 0 0}
+#result pre{font:18px/1.1 ui-monospace,monospace;margin:10px 0 0}
 footer{display:flex;justify-content:center;gap:16px;font-size:14px}
 .link{border:0;background:none;color:var(--muted);text-decoration:underline;cursor:pointer;padding:4px}
 #toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,40px);opacity:0;background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;transition:.25s;pointer-events:none}
@@ -118,6 +127,7 @@ footer{display:flex;justify-content:center;gap:16px;font-size:14px}
   <header>
     <div>
       <h1>Gerrymander <small id="num">#1</small></h1>
+      <p class="place">📍 <span id="place">…</span></p>
       <p class="sub">Carve the island into <b>5 districts of 5</b>. <b class="ob">Orange</b> is outnumbered <b>11–14</b>, so rig it: make Orange win <b>3</b>.</p>
     </div>
     <button class="icon-btn" id="mute" aria-label="Toggle sound">🔊</button>
@@ -125,20 +135,34 @@ footer{display:flex;justify-content:center;gap:16px;font-size:14px}
 
   <div class="hud">
     <div class="pill"><span class="dot o"></span><span id="oWins">0</span></div>
-    <div class="pill mid"><span>Districts <b id="dCount">0</b>/5</span><span>·</span><span title="How rigged your map looks. Lower = tidier districts. Par is the tidiest winning map.">Suspicion <b id="susp">–</b> <span id="parWrap">(par <b id="par">–</b>)</span></span></div>
+    <div class="pill mid"><span>Districts <b id="dCount">0</b>/5</span><span>·</span><span title="How rigged your map looks. Lower = tidier districts. Par is the tidiest winning map.">Suspicion <b id="susp">–</b> (par <b id="par">–</b>)</span></div>
     <div class="pill"><span id="pWins">0</span><span class="dot p"></span></div>
   </div>
 
   <div id="sea">
-    <div id="board" class="layer"></div>
-    <svg id="overlay" class="layer" viewBox="0 0 500 500" aria-hidden="true">
-      <defs><filter id="glow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-      <g id="distLayer"></g><g id="liveLayer"></g>
+    <svg id="map" viewBox="0 0 500 500" aria-label="Island map">
+      <defs>
+        <clipPath id="isle"><path id="isleClip"/></clipPath>
+        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <g id="maskDefs"></g>
+      </defs>
+      <path id="surf" class="surf"/>
+      <path id="cliff" class="cliff" transform="translate(0 11)"/>
+      <path id="beach" class="beach"/>
+      <g clip-path="url(#isle)">
+        <g id="cells"></g>
+        <path id="precincts" class="precincts"/>
+        <g id="distLayer"></g>
+        <path id="preview" class="preview"/>
+      </g>
+      <path id="shoreline" class="shoreline"/>
+      <g id="blobs"></g>
+      <g id="liveLayer"></g>
     </svg>
-    <div id="stamps" class="layer"></div>
+    <div id="stamps"></div>
   </div>
 
-  <p class="help">Drag across 5 neighbouring tiles to fence a district · tap a district to tear it down · 3 of 5 wins a seat</p>
+  <p class="help">Drag across 5 neighbouring precincts to fence a district · tap a district to tear it down · 3 of 5 wins a seat</p>
 
   <div class="controls">
     <button class="btn" id="undo">Undo</button>
@@ -149,32 +173,84 @@ footer{display:flex;justify-content:center;gap:16px;font-size:14px}
   <section id="result" hidden></section>
 
   <footer>
-    <button class="link" id="practice">New practice map</button>
-    <button class="link" id="daily" hidden>Back to today's map</button>
+    <button class="link" id="practice">New practice island</button>
+    <button class="link" id="daily" hidden>Back to today's island</button>
   </footer>
 </main>
 <div id="toast" role="status"></div>
 
 <script>
 (() => {
-/* ---------- core: grid, partitions, level generation ---------- */
-const N=5,C=25,S=5,ORANGE=11,LO=0.004,HI=0.03;
-const rc=i=>[Math.floor(i/N),i%N];
-const NB=[];for(let i=0;i<C;i++){const[r,c]=rc(i);NB[i]=[];if(r>0)NB[i].push(i-N);if(r<N-1)NB[i].push(i+N);if(c>0)NB[i].push(i-1);if(c<N-1)NB[i].push(i+1);}
-const bits=m=>{const a=[];for(let i=0;i<C;i++)if(m>>i&1)a.push(i);return a};
+/* ---------- utilities ---------- */
+const C=25,S=5,ORANGE=11,W=500,G=4,NG=W/G,MINADJ=3,LO=0.004,HI=0.03;
 const pc=m=>{let c=0;while(m){m&=m-1;c++}return c};
+const bits=m=>{const a=[];for(let i=0;i<C;i++)if(m>>i&1)a.push(i);return a};
 function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
-// every connected 5-tile shape that fits on the board
-const PL=(()=>{const seen=new Set();for(let s=0;s<C;s++){let lv=new Set([1<<s]);for(let k=1;k<S;k++){const nx=new Set();for(const m of lv)for(const c of bits(m))for(const n of NB[c])if(!(m>>n&1))nx.add(m|1<<n);lv=nx}for(const m of lv)seen.add(m)}return[...seen]})();
-// suspicion of a district = spread of its tiles around their centre (x5 so it is an integer)
-const SPR=new Map(PL.map(m=>{const cs=bits(m).map(rc);const mr=cs.reduce((a,p)=>a+p[0],0)/S,mc=cs.reduce((a,p)=>a+p[1],0)/S;return[m,Math.round(cs.reduce((a,p)=>a+(p[0]-mr)**2+(p[1]-mc)**2,0)*S)]}));
-const FULL=(1<<C)-1;
-function okFree(used){let seen=used;for(let i=0;i<C;i++)if(!(seen>>i&1)){let st=[i],n=0;seen|=1<<i;while(st.length){const x=st.pop();n++;for(const y of NB[x])if(!(seen>>y&1)){seen|=1<<y;st.push(y)}}if(n%S)return false}return true}
-// all 4006 ways to split the island into 5 districts of 5
-const PARTS=(()=>{const byMin=Array.from({length:C},()=>[]);for(const m of PL){let i=0;while(!(m>>i&1))i++;byMin[i].push(m)}const out=[],cur=[];(function rec(used){if(used===FULL){out.push(cur.slice());return}let c=0;while(used>>c&1)c++;for(const m of byMin[c])if(!(m&used)&&okFree(used|m)){cur.push(m);rec(used|m);cur.pop()}})(0);return out})();
-function evalLayout(om){let win=0,par=Infinity;for(const P of PARTS){let w=0,s=0;for(const m of P){if(pc(m&om)>=3)w++;s+=SPR.get(m)}if(w>=3){win++;if(s<par)par=s}}return{win,par}}
-// hard-but-fair: only 0.4%–3% of all possible maps should be winning ones
-function makeLevel(seed){const rnd=mulberry32(seed);let best=null;for(let t=0;t<400;t++){const cells=[...Array(C).keys()];for(let i=C-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[cells[i],cells[j]]=[cells[j],cells[i]]}let om=0;for(let i=0;i<ORANGE;i++)om|=1<<cells[i];const e=evalLayout(om);const f=e.win/PARTS.length;if(e.win>0&&f>=LO&&f<=HI)return{om,...e};if(e.win>0&&(!best||e.win<best.win))best={om,...e}}return best}
+function pip(x,y,P){let c=false;for(let i=0,j=P.length-1;i<P.length;j=i++){const[xi,yi]=P[i],[xj,yj]=P[j];if((yi>y)!==(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)c=!c}return c}
+const f1=v=>v.toFixed(1);
+const polyD=P=>'M'+P.map(p=>f1(p[0])+' '+f1(p[1])).join('L')+'Z';
+
+/* ---------- map generation: blobby island, 25 relaxed Voronoi precincts ---------- */
+function genMap(rnd){
+  const cx=250,cy=252,R=196,amp=[.06+rnd()*.06,.04+rnd()*.05,.02+rnd()*.03],ph=[0,0,0].map(()=>rnd()*7),K=[2,3,5],coast=[];
+  for(let t=0;t<120;t++){const th=t/120*2*Math.PI;let r=R;for(let q=0;q<3;q++)r+=R*amp[q]*Math.sin(K[q]*th+ph[q]);r=Math.min(r,226);coast.push([cx+r*Math.cos(th),cy+r*Math.sin(th)*.93])}
+  const land=new Uint8Array(NG*NG);let landN=0;
+  for(let gy=0;gy<NG;gy++)for(let gx=0;gx<NG;gx++)if(pip(gx*G+G/2,gy*G+G/2,coast)){land[gy*NG+gx]=1;landN++}
+  const sp=Math.sqrt(landN*G*G/C);let sites=[],D=sp*.8;
+  while(sites.length<C){let tries=0;sites=[];while(sites.length<C&&tries<4000){tries++;const x=rnd()*W,y=rnd()*W;if(!land[Math.floor(y/G)*NG+Math.floor(x/G)])continue;if(sites.every(s=>Math.hypot(s[0]-x,s[1]-y)>=D))sites.push([x,y])}D*=.93}
+  const own=new Int8Array(NG*NG).fill(-1);let cent,area;
+  for(let it=0;it<5;it++){ // Lloyd relaxation over the land raster
+    for(let g=0;g<NG*NG;g++)if(land[g]){const x=(g%NG)*G+G/2,y=Math.floor(g/NG)*G+G/2;let b=0,bd=1e9;for(let i=0;i<C;i++){const d=(sites[i][0]-x)**2+(sites[i][1]-y)**2;if(d<bd){bd=d;b=i}}own[g]=b}
+    cent=sites.map(()=>[0,0]);area=new Array(C).fill(0);
+    for(let g=0;g<NG*NG;g++)if(land[g]){const i=own[g];cent[i][0]+=(g%NG)*G+G/2;cent[i][1]+=Math.floor(g/NG)*G+G/2;area[i]++}
+    cent=cent.map((c,i)=>[c[0]/area[i],c[1]/area[i]]);if(it<4)sites=cent.map(c=>c.slice())}
+  const sh=Array.from({length:C},()=>new Array(C).fill(0));
+  for(let gy=0;gy<NG;gy++)for(let gx=0;gx<NG;gx++){const g=gy*NG+gx;if(!land[g])continue;const a=own[g];
+    if(gx<NG-1&&land[g+1]&&own[g+1]!==a){sh[a][own[g+1]]++;sh[own[g+1]][a]++}
+    if(gy<NG-1&&land[g+NG]&&own[g+NG]!==a){sh[a][own[g+NG]]++;sh[own[g+NG]][a]++}}
+  const NB=sh.map(r=>r.map((v,j)=>v>=MINADJ?j:-1).filter(j=>j>=0));
+  // exact Voronoi polygons (clipped half-planes), each edge tagged with the neighbour that made it
+  const polys=sites.map((s,i)=>{let P=[[-30,-30,-1],[530,-30,-1],[530,530,-1],[-30,530,-1]];
+    for(let j=0;j<C;j++){if(j===i)continue;const nx=sites[j][0]-s[0],ny=sites[j][1]-s[1],mx=(s[0]+sites[j][0])/2,my=(s[1]+sites[j][1])/2,f=p=>(p[0]-mx)*nx+(p[1]-my)*ny,Q=[];
+      for(let k=0;k<P.length;k++){const a=P[k],b=P[(k+1)%P.length],fa=f(a),fb=f(b);if(fa<=0)Q.push(a);if((fa<=0)!==(fb<=0)){const t=fa/(fa-fb);Q.push([a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,fa<=0?j:a[2]])}}
+      P=Q}return P});
+  const ok=Math.min(...area)>=.45*landN/C;
+  return{coast,sites,cent,NB,sp,polys,ok};
+}
+function enumerate(NB){
+  const seen=new Set();
+  for(let s=0;s<C;s++){let lv=new Set([1<<s]);for(let k=1;k<S;k++){const nx=new Set();for(const m of lv)for(const c of bits(m))for(const n of NB[c])if(!(m>>n&1))nx.add(m|1<<n);lv=nx}for(const m of lv)seen.add(m)}
+  const PL=[...seen],byMin=Array.from({length:C},()=>[]);PL.forEach((m,k)=>{let i=0;while(!(m>>i&1))i++;byMin[i].push(k)});
+  const FULL=(1<<C)-1;
+  const okFree=used=>{let sn=used;for(let i=0;i<C;i++)if(!(sn>>i&1)){let st=[i],n=0;sn|=1<<i;while(st.length){const x=st.pop();n++;for(const y of NB[x])if(!(sn>>y&1)){sn|=1<<y;st.push(y)}}if(n%S)return false}return true};
+  const out=[],cur=[];
+  (function rec(used){if(used===FULL){for(const k of cur)out.push(k);return}let c=0;while(used>>c&1)c++;for(const k of byMin[c]){const m=PL[k];if(!(m&used)&&okFree(used|m)){cur.push(k);rec(used|m);cur.pop()}}})(0);
+  return{PL,PARTS:Int32Array.from(out)};
+}
+const NAME_A=['Port','Isle of','Saint','Little','Great','North','Upper','Old','New','Lower'],NAME_B=['Wobble','Gloop','Squish','Jelly','Puddle','Plop','Bobble','Smoosh','Dribble','Mallow','Fizz','Blub','Wibble','Splodge','Goo'],NAME_C=['ton','wick','by','mouth','haven','ford','stead','combe','-on-Sea','sey'];
+function makeLevel(seed){
+  const rnd=mulberry32(seed);
+  for(let attempt=0;attempt<12;attempt++){
+    const M=genMap(rnd);if(!M.ok)continue;
+    const E=enumerate(M.NB),nP=E.PARTS.length/S;if(nP<1500||nP>120000)continue;
+    // suspicion: spread of each district around its centre, in precinct-spacing units (x5, integer)
+    const SPR=E.PL.map(m=>{const cs=bits(m).map(i=>M.cent[i]);const mx=cs.reduce((a,p)=>a+p[0],0)/S,my=cs.reduce((a,p)=>a+p[1],0)/S;return Math.round(cs.reduce((a,p)=>a+(p[0]-mx)**2+(p[1]-my)**2,0)/M.sp**2*S)});
+    const PS=new Int32Array(nP);for(let q=0;q<nP;q++){let s=0;for(let k=0;k<S;k++)s+=SPR[E.PARTS[q*S+k]];PS[q]=s}
+    const wf=new Uint8Array(E.PL.length);let best=null;
+    for(let t=0;t<160;t++){
+      const cells=[...Array(C).keys()];for(let i=C-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[cells[i],cells[j]]=[cells[j],cells[i]]}
+      let om=0;for(let i=0;i<ORANGE;i++)om|=1<<cells[i];
+      for(let k=0;k<E.PL.length;k++)wf[k]=pc(E.PL[k]&om)>=3?1:0;
+      let win=0,par=1e9;for(let q=0;q<nP;q++){const b=q*S;if(wf[E.PARTS[b]]+wf[E.PARTS[b+1]]+wf[E.PARTS[b+2]]+wf[E.PARTS[b+3]]+wf[E.PARTS[b+4]]>=3){win++;if(PS[q]<par)par=PS[q]}}
+      const f=win/nP,cand={om,win,par};
+      if(win>0&&f>=LO&&f<=HI){best=cand;break}
+      if(win>0&&(!best||Math.abs(f-.015)<Math.abs(best.win/nP-.015)))best=cand}
+    if(!best)continue;
+    const pick=a=>a[Math.floor(rnd()*a.length)];let name=pick(NAME_A)+' '+pick(NAME_B)+pick(NAME_C);name=name.replace(' -','-');
+    return{...M,...best,PL:E.PL,SPRm:new Map(E.PL.map((m,k)=>[m,SPR[k]])),total:nP,name};
+  }
+  return null;
+}
 const EPOCH=Date.UTC(2026,10,17);
 function todayNum(){const d=new Date();return Math.floor((Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())-EPOCH)/864e5)+1}
 
@@ -197,104 +273,107 @@ const sfx={
 
 /* ---------- elements ---------- */
 const $=id=>document.getElementById(id);
-const sea=$('sea'),board=$('board'),distLayer=$('distLayer'),liveLayer=$('liveLayer'),stampsEl=$('stamps');
-const BLOB=`<svg class="blob" viewBox="0 0 100 100"><g class="body-g">
+const sea=$('sea'),svg=$('map'),cellsG=$('cells'),blobsG=$('blobs'),distLayer=$('distLayer'),maskDefs=$('maskDefs'),liveLayer=$('liveLayer'),stampsEl=$('stamps');
+const BLOB=`<ellipse class="shadow" cx="50" cy="92" rx="34" ry="7"/><g class="body-g">
 <path class="body" d="M50 12C77 12 89 33 89 57C89 80 73 91 50 91C27 91 11 80 11 57C11 33 23 12 50 12Z"/>
 <ellipse class="shine" cx="34" cy="30" rx="11" ry="6" transform="rotate(-20 34 30)"/>
 <g class="eyes"><circle cx="38" cy="50" r="6.5"/><circle cx="62" cy="50" r="6.5"/></g>
 <g class="shades"><path d="M22 43h24v6a9 9 0 0 1-9 9h-6a9 9 0 0 1-9-9z"/><path d="M54 43h24v6a9 9 0 0 1-9 9h-6a9 9 0 0 1-9-9z"/><path class="bridge" d="M44 46h12"/><path class="glint" d="M27 46h6l-3 5h-4z"/></g>
 <path class="mouth m-flat" d="M42 69h16"/><path class="mouth m-smile" d="M38 65Q50 78 62 65"/><path class="mouth m-frown" d="M40 73Q50 64 60 73"/>
-<path class="sweat" d="M84 26q7 11 0 15q-7-4 0-15z"/></g></svg>`;
+<path class="sweat" d="M84 26q7 11 0 15q-7-4 0-15z"/></g>`;
 
 /* ---------- state ---------- */
-let L,mode='daily',num=todayNum(),districts=[],owner=[],draw=null,trail=[],last=null,pendingRemove=-1,locked=false,attempts=1,tiles=[];
+let L,COASTD,mode='daily',num=todayNum(),districts=[],owner=[],draw=null,trail=[],last=null,pendingRemove=-1,locked=false,attempts=1,blobs=[],cellEls=[];
 const lean=m=>{const o=pc(m&L.om),p=pc(m)-o;return o>p?'o':p>o?'p':''};
+const SPR=m=>L.SPRm.get(m)||0;
 const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 
 function load(newMode){
   mode=newMode;
-  const seed=mode==='daily'?(Math.imul(num,2654435761)>>>0)^0x5eed:(Math.random()*2**32)>>>0;
-  L=makeLevel(seed);attempts=1;
+  let seed=mode==='daily'?(Math.imul(num,2654435761)>>>0)^0x5eed:(Math.random()*2**32)>>>0;
+  L=null;while(!L){L=makeLevel(seed);seed=(seed+0x9e3779b9)>>>0}
+  attempts=1;
   $('num').textContent=mode==='daily'?'#'+num:'Practice';
-  $('par').textContent=L.par;
-  $('daily').hidden=mode==='daily';
-  board.innerHTML='';tiles=[];
-  for(let i=0;i<C;i++){const t=document.createElement('div');t.className='tile '+((L.om>>i&1)?'o':'p');t.innerHTML=`<div class="tile-in">${BLOB}</div>`;t.querySelector('.eyes').style.animationDelay=(-Math.random()*4.5).toFixed(2)+'s';board.appendChild(t);tiles.push(t)}
+  $('place').textContent=L.name;$('par').textContent=L.par;$('daily').hidden=mode==='daily';
+  COASTD=polyD(L.coast);
+  ['isleClip','surf','cliff','beach','shoreline'].forEach(id=>$(id).setAttribute('d',COASTD));
+  cellsG.innerHTML=L.polys.map((P,i)=>`<path class="cell l${i%4}" d="${polyD(P)}"/>`).join('');
+  let pd='';L.polys.forEach((P,i)=>P.forEach((a,k)=>{if(a[2]>i){const b=P[(k+1)%P.length];pd+=`M${f1(a[0])} ${f1(a[1])}L${f1(b[0])} ${f1(b[1])}`}}));
+  $('precincts').setAttribute('d',pd);
+  const sc=L.sp*.7/100;
+  blobsG.innerHTML=L.cent.map((c,i)=>`<g class="blob ${(L.om>>i&1)?'o':'p'}" transform="translate(${f1(c[0])} ${f1(c[1])})"><g transform="scale(${sc.toFixed(3)}) translate(-50 -58)"><g class="fx">${BLOB}</g></g></g>`).join('');
+  cellEls=[...cellsG.children];blobs=[...blobsG.children];
+  blobs.forEach(b=>b.querySelector('.eyes').style.animationDelay=(-Math.random()*4.5).toFixed(2)+'s');
   clearMap();
-  const best=mode==='daily'&&store.get('gm-best-'+num);
+  const best=mode==='daily'&&store.get('gm2-best-'+num);
   if(best)showResult(best,true);
 }
-function clearMap(){districts=[];owner=new Array(C).fill(-1);draw=null;trail=[];locked=false;stampsEl.innerHTML='';$('result').hidden=true;tiles.forEach(t=>t.classList.remove('won-o','won-p','flip'));refresh(true)}
+function clearMap(){districts=[];owner=new Array(C).fill(-1);draw=null;trail=[];locked=false;stampsEl.innerHTML='';$('result').hidden=true;
+  cellEls.forEach(c=>c.classList.remove('won-o','won-p'));blobs.forEach(b=>b.classList.remove('flip'));refresh(true)}
 function rebuildOwner(){owner.fill(-1);districts.forEach((d,j)=>bits(d.mask).forEach(i=>owner[i]=j))}
 
 /* ---------- geometry ---------- */
-function outline(m,inset){
-  const E=new Map(),add=(a,b,c,d)=>E.set(a+','+b,[c,d]);
-  for(const i of bits(m)){const[r,c]=rc(i);
-    if(r===0||!(m>>(i-N)&1))add(c,r,c+1,r);
-    if(c===N-1||!(m>>(i+1)&1))add(c+1,r,c+1,r+1);
-    if(r===N-1||!(m>>(i+N)&1))add(c+1,r+1,c,r+1);
-    if(c===0||!(m>>(i-1)&1))add(c,r+1,c,r);}
-  const k0=E.keys().next().value,pts=[];let k=k0;
-  do{pts.push(k.split(',').map(Number));const n=E.get(k);k=n[0]+','+n[1]}while(k!==k0&&pts.length<60);
-  const n=pts.length,out=[];
-  for(let j=0;j<n;j++){const a=pts[(j-1+n)%n],b=pts[j],c=pts[(j+1)%n];const d1=[Math.sign(b[0]-a[0]),Math.sign(b[1]-a[1])],d2=[Math.sign(c[0]-b[0]),Math.sign(c[1]-b[1])];if(d1[0]===d2[0]&&d1[1]===d2[1])continue;
-    out.push((b[0]*100+inset*(-d1[1]-d2[1])).toFixed(1)+' '+(b[1]*100+inset*(d1[0]+d2[0])).toFixed(1))}
-  return 'M'+out.join('L')+'Z';
-}
-function pt(e){const r=board.getBoundingClientRect();return[(e.clientX-r.left)/r.width*500,(e.clientY-r.top)/r.height*500]}
-function cellAt(p,radius=50){if(p[0]<0||p[1]<0||p[0]>=500||p[1]>=500)return-1;const c=Math.floor(p[0]/100),r=Math.floor(p[1]/100);return Math.hypot(p[0]-(c*100+50),p[1]-(r*100+50))<=radius?r*N+c:-1}
+function borderD(m){let d='';for(const i of bits(m)){const P=L.polys[i];for(let k=0;k<P.length;k++){const j=P[k][2];if(j<0||(m>>j&1))continue;const a=P[k],b=P[(k+1)%P.length];d+=`M${f1(a[0])} ${f1(a[1])}L${f1(b[0])} ${f1(b[1])}`}}return d}
+const unionD=m=>bits(m).map(i=>polyD(L.polys[i])).join('');
+const centre=m=>{const cs=bits(m).map(i=>L.cent[i]);return[cs.reduce((a,p)=>a+p[0],0)/cs.length,cs.reduce((a,p)=>a+p[1],0)/cs.length]};
+function pt(e){const r=svg.getBoundingClientRect();return[(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*W]}
+function nearest(p){let i1=-1,d1=1e9,d2=1e9;for(let i=0;i<C;i++){const d=Math.hypot(p[0]-L.sites[i][0],p[1]-L.sites[i][1]);if(d<d1){d2=d1;d1=d;i1=i}else if(d<d2)d2=d}return{i:i1,d1,d2}}
+function cellAt(p,strict){const n=nearest(p);if(n.d1>L.sp*(strict?.75:.85))return-1;if(strict&&n.d2-n.d1<L.sp*.16)return-1;return n.i}
 
 /* ---------- rendering ---------- */
-function setMood(t,m){if(t.dataset.mood===m)return;t.dataset.mood=m;t.classList.remove('cool','smug','nervous','sad');if(m){t.classList.add(m);if(m==='cool')t.querySelector('.body-g').style.animationDelay=-(performance.now()%500)+'ms'}}
+function setMood(b,m){if(b.dataset.mood===m)return;b.dataset.mood=m;b.classList.remove('cool','smug','nervous','sad');if(m){b.classList.add(m);if(m==='cool')b.querySelector('.body-g').style.animationDelay=-(performance.now()%500)+'ms'}}
 function refresh(districtsChanged){
   for(let i=0;i<C;i++){
-    const t=tiles[i],mine=(L.om>>i&1)?'o':'p',inDraw=!!(draw&&draw.mask>>i&1),d=owner[i];
+    const mine=(L.om>>i&1)?'o':'p',inDraw=!!(draw&&draw.mask>>i&1),d=owner[i];
     const g=inDraw?draw.mask:d>=0?districts[d].mask:0,ln=g?lean(g):'';
-    setMood(t,!ln?'':ln===mine?(mine==='o'?'cool':'smug'):(mine==='p'?'nervous':'sad'));
-    t.classList.toggle('sel',inDraw);
-    const dl=d>=0?lean(districts[d].mask):'';t.classList.toggle('d-o',dl==='o');t.classList.toggle('d-p',dl==='p');
+    setMood(blobs[i],!ln?'':ln===mine?(mine==='o'?'cool':'smug'):(mine==='p'?'nervous':'sad'));
+    const c=cellEls[i],dl=d>=0?lean(districts[d].mask):'';
+    c.classList.toggle('sel',inDraw);c.classList.toggle('d-o',dl==='o');c.classList.toggle('d-p',dl==='p');
   }
-  if(!locked){let ow=0,pw=0,s=0;for(const d of districts){lean(d.mask)==='o'?ow++:pw++;s+=SPR.get(d.mask)}
+  if(!locked){let ow=0,pw=0,s=0;for(const d of districts){lean(d.mask)==='o'?ow++:pw++;s+=SPR(d.mask)}
     $('oWins').textContent=ow;$('pWins').textContent=pw;$('susp').textContent=districts.length?s:'–'}
   $('dCount').textContent=districts.length;
   $('certify').disabled=districts.length<5||locked;$('undo').disabled=!districts.length||locked;$('reset').disabled=!districts.length||locked;
-  if(districtsChanged){distLayer.innerHTML=districts.map(d=>`<path class="dist ${lean(d.mask)}${d.fresh?' snap':''}" d="${outline(d.mask,8)}"/>`).join('');districts.forEach(d=>d.fresh=false)}
+  if(districtsChanged){
+    maskDefs.innerHTML=districts.map((d,j)=>`<mask id="mk${j}" maskUnits="userSpaceOnUse" x="-40" y="-40" width="580" height="580"><path fill="#fff" d="${unionD(d.mask)}"/></mask>`).join('');
+    distLayer.innerHTML=districts.map((d,j)=>{const[cx,cy]=centre(d.mask);return`<g class="dist ${lean(d.mask)}${d.fresh?' snap':''}" style="transform-origin:${f1(cx)}px ${f1(cy)}px"><path class="band" mask="url(#mk${j})" d="${borderD(d.mask)}${COASTD}"/></g>`}).join('');
+    districts.forEach(d=>d.fresh=false)}
+  $('preview').setAttribute('d',draw?borderD(draw.mask):'');
   drawLive();
 }
 function drawLive(){
   let h='';
-  if(draw)h+=`<path class="preview" d="${outline(draw.mask,8)}"/>`;
-  if(trail.length>1){const p=trail.map(q=>q[0].toFixed(0)+','+q[1].toFixed(0)).join(' ');h+=`<polyline class="laser" points="${p}"/><polyline class="laser-core" points="${p}"/>`}
+  if(trail.length>1){const p=trail.map(q=>q[0].toFixed(0)+','+q[1].toFixed(0)).join(' ');h=`<polyline class="laser" points="${p}"/><polyline class="laser-core" points="${p}"/>`}
   liveLayer.innerHTML=h;
 }
 function bump(el){el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop')}
+function retrigger(el,cls){el.classList.remove(cls);void el.getBoundingClientRect();el.classList.add(cls)}
 
 /* ---------- drawing input ---------- */
 function tryAdd(i){
   if(!draw||i<0||draw.mask>>i&1||owner[i]>=0)return;
-  if(!NB[i].some(n=>draw.mask>>n&1))return;
+  if(!L.NB[i].some(n=>draw.mask>>n&1))return;
   draw.cells.push(i);draw.mask|=1<<i;sfx.tick(draw.cells.length-1);
   if(navigator.vibrate)try{navigator.vibrate(6)}catch(e){}
   if(draw.cells.length===S)commit();else refresh(false);
 }
 function commit(){
   const m=draw.mask;districts.push({mask:m,fresh:true});draw=null;rebuildOwner();
-  bits(m).forEach(i=>{const t=tiles[i];t.classList.remove('squish');void t.offsetWidth;t.classList.add('squish')});
+  bits(m).forEach(i=>retrigger(blobs[i],'squish'));
   sfx.snap();refresh(true);bump($(lean(m)==='o'?'oWins':'pWins'));
 }
 function removeDistrict(j){districts.splice(j,1);rebuildOwner();sfx.tear();refresh(true)}
 
 sea.addEventListener('pointerdown',e=>{
-  if(locked)return;A();const p=pt(e),i=cellAt(p,60);if(i<0)return;
+  if(locked)return;A();const p=pt(e),i=cellAt(p,false);if(i<0)return;
   try{sea.setPointerCapture(e.pointerId)}catch(_){}
   if(owner[i]>=0){pendingRemove=owner[i];return}
   draw={cells:[i],mask:1<<i};last=p;trail=[p];sfx.tick(0);refresh(false);
 });
 sea.addEventListener('pointermove',e=>{
   if(!draw&&!trail.length)return;const p=pt(e);
-  if(draw&&last){const steps=Math.max(1,Math.ceil(Math.hypot(p[0]-last[0],p[1]-last[1])/15));
-    for(let s=1;s<=steps&&draw;s++)tryAdd(cellAt([last[0]+(p[0]-last[0])*s/steps,last[1]+(p[1]-last[1])*s/steps],42))}
+  if(draw&&last){const steps=Math.max(1,Math.ceil(Math.hypot(p[0]-last[0],p[1]-last[1])/8));
+    for(let s=1;s<=steps&&draw;s++)tryAdd(cellAt([last[0]+(p[0]-last[0])*s/steps,last[1]+(p[1]-last[1])*s/steps],true))}
   last=p;if(trail.length){trail.push(p);if(trail.length>18)trail.shift()}drawLive();
 });
 function endPointer(){
@@ -306,34 +385,39 @@ sea.addEventListener('pointerup',endPointer);sea.addEventListener('pointercancel
 
 /* ---------- certification ---------- */
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
+function mosaic(){
+  const xs=L.coast.map(p=>p[0]),ys=L.coast.map(p=>p[1]),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+  const cols=8,rows=Math.max(5,Math.round(cols*(y1-y0)/(x1-x0))),out=[];
+  for(let r=0;r<rows;r++){let row='';for(let c=0;c<cols;c++){const x=x0+(c+.5)*(x1-x0)/cols,y=y0+(r+.5)*(y1-y0)/rows;
+    if(!pip(x,y,L.coast)){row+='🟦';continue}row+=lean(districts[owner[nearest([x,y]).i]].mask)==='o'?'🟧':'🟪'}out.push(row)}
+  return out;
+}
 async function certify(){
   if(districts.length<5||locked)return;locked=true;refresh(false);
   let ow=0,pw=0;$('oWins').textContent=0;$('pWins').textContent=0;
-  const order=districts.map(d=>{const cs=bits(d.mask);return{d,cs,cx:cs.reduce((a,i)=>a+rc(i)[1],0)/S}}).sort((a,b)=>a.cx-b.cx);
+  const order=districts.map(d=>({d,cs:bits(d.mask).sort((a,b)=>L.cent[a][0]-L.cent[b][0]),c:centre(d.mask)})).sort((a,b)=>a.c[0]-b.c[0]);
   for(let j=0;j<order.length;j++){
-    const{d,cs}=order[j],w=lean(d.mask);
-    cs.forEach((i,k)=>setTimeout(()=>{tiles[i].classList.add('flip');sfx.clack(k);setTimeout(()=>tiles[i].classList.add('won-'+w),210)},k*65));
+    const{d,cs,c}=order[j],w=lean(d.mask);
+    cs.forEach((i,k)=>setTimeout(()=>{retrigger(blobs[i],'flip');sfx.clack(k);setTimeout(()=>cellEls[i].classList.add('won-'+w),210)},k*65));
     await wait(cs.length*65+260);
-    const r=cs.reduce((a,i)=>a+rc(i)[0],0)/S,c=cs.reduce((a,i)=>a+rc(i)[1],0)/S;
     const st=document.createElement('div');st.className='stamp '+w;st.textContent=(w==='o'?'ORANGE':'PURPLE')+' +1';
-    st.style.left=((c+.5)*20)+'%';st.style.top=((r+.5)*20)+'%';stampsEl.appendChild(st);
-    thud();sfx.chime(j);sea.classList.remove('shake');void sea.offsetWidth;sea.classList.add('shake');
+    st.style.left=(c[0]/W*100)+'%';st.style.top=(c[1]/W*100)+'%';stampsEl.appendChild(st);
+    thud();sfx.chime(j);retrigger(sea,'shake');
     if(w==='o'){ow++;$('oWins').textContent=ow;bump($('oWins'))}else{pw++;$('pWins').textContent=pw;bump($('pWins'))}
     await wait(420);
   }
   await wait(250);
-  const susp=districts.reduce((a,d)=>a+SPR.get(d.mask),0);
-  const mosaic=[];for(let r=0;r<N;r++){let row='';for(let c=0;c<N;c++)row+=lean(districts[owner[r*N+c]].mask)==='o'?'🟧':'🟪';mosaic.push(row)}
-  const res={ow,pw,susp,par:L.par,attempts,mosaic};
-  if(mode==='daily'&&ow>=3){const best=store.get('gm-best-'+num);if(!best||susp<best.susp)store.set('gm-best-'+num,res)}
+  const susp=districts.reduce((a,d)=>a+SPR(d.mask),0);
+  const res={ow,pw,susp,par:L.par,attempts,mosaic:mosaic(),name:L.name};
+  if(mode==='daily'&&ow>=3){const best=store.get('gm2-best-'+num);if(!best||susp<best.susp)store.set('gm2-best-'+num,res)}
   showResult(res,false);
 }
 function grade(r){if(r.ow<3)return['Purple holds the island','The voters got their way. Unacceptable.'];
   if(r.susp<=r.par)return['Flawless rig','Tidiest winning map possible. The courts suspect nothing.'];
   if(r.susp<=r.par+12)return['Certified!','A little lumpy, but it should survive a court challenge.'];
   return['Certified… barely','Those districts look like a salamander. Journalists are circling.']}
-function shareText(r){const head=mode==='daily'?`Gerrymander #${num}`:'Gerrymander Practice';
-  return `${head} | ${r.ow}-${r.pw} ${r.ow>=3?'Victory':'Defeat'} | Suspicion ${r.susp} (par ${r.par})${r.attempts>1?` | ${r.attempts} tries`:''}\n${r.mosaic.join('\n')}`}
+function shareText(r){const head=mode==='daily'?`Gerrymander #${num} · ${r.name}`:`Gerrymander Practice · ${r.name}`;
+  return `${head}\n${r.ow}-${r.pw} ${r.ow>=3?'Victory':'Defeat'} | Suspicion ${r.susp} (par ${r.par})${r.attempts>1?` | ${r.attempts} tries`:''}\n${r.mosaic.join('\n')}`}
 function showResult(r,restored){
   const[h,p]=grade(r),el=$('result');
   el.innerHTML=`<h2>${restored?"Today's best: ":''}${h}</h2><p>${p}</p><p><b>${r.ow}–${r.pw}</b> · Suspicion <b>${r.susp}</b> (par ${r.par})${r.attempts>1?` · ${r.attempts} tries`:''}</p><pre>${r.mosaic.join('\n')}</pre>
@@ -361,7 +445,7 @@ const mb=$('mute');mb.textContent=muted?'🔇':'🔊';
 mb.onclick=()=>{muted=!muted;mb.textContent=muted?'🔇':'🔊';try{localStorage.setItem('gm-muted',muted?'1':'0')}catch(e){}};
 
 load('daily');
-window.__gm={get L(){return L},PARTS,SPR,lean,get districts(){return districts}};
+window.__gm={get L(){return L},get districts(){return districts},enumerate,bits,lean};
 })();
 </script>
 </body>
